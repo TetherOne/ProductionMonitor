@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    container_name: productionmonitor-app
+    restart: on-failure
+    command: sh -c "uvicorn src.production_monitor.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/src
+    working_dir: /src
+    ports:
+      - "8005:8000"
