@@ -1,4 +1,9 @@
-__all__ = ("Base", "ProductionBatch")
+__all__ = (
+    "Base",
+    "ShiftTask",
+    "ProductCode",
+)
 
 from src.production_monitor.models.base import Base
-from src.production_monitor.models.production import ProductionBatch
+from src.production_monitor.models.shift_task import ShiftTask
+from src.production_monitor.models.product_code import ProductCode
