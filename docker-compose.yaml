@@ -5,9 +5,23 @@ services:
     build: .
     container_name: productionmonitor-app
     restart: on-failure
-    command: sh -c "uvicorn src.production_monitor.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: sh -c "alembic upgrade head &&
+                    uvicorn src.production_monitor.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - .:/src
     working_dir: /src
     ports:
       - "8005:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./envs/app.env
+
+  db:
+    image: postgres
+    container_name: productionmonitor-db
+    restart: on-failure
+    env_file:
+      - ./envs/db.env
+    ports:
+      - "5432:5432"
