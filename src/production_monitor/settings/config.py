@@ -2,6 +2,15 @@ from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
+class APIPrefix(BaseModel):
+    prefix: str = "/api"
+    shift_tasks: str = "/shift-tasks"
+
+    @property
+    def full_prefix(self) -> str:
+        return f"{self.prefix}"
+
+
 class DatabaseConfig(BaseModel):
     url: PostgresDsn
     echo: bool = False
@@ -18,6 +27,7 @@ class Settings(BaseSettings):
         env_prefix="PRODUCTION_MONITOR__",
         arbitrary_types_allowed=True,
     )
+    api: APIPrefix = APIPrefix()
     db: DatabaseConfig
 
 
