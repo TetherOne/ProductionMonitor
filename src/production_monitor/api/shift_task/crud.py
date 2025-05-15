@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.production_monitor.api.shift_task.schemas import (
     ShiftTaskSchema,
     ShiftTaskCreateSchema,
+    ShiftTaskUpdateSchema,
 )
 from src.production_monitor.models import ShiftTask
 
@@ -57,3 +58,21 @@ async def create_shift_tasks(
         created_tasks.append(task_data)
     await session.commit()
     return created_tasks
+
+
+async def update_shift_task(
+    session: AsyncSession,
+    task: ShiftTask,
+    update_data: ShiftTaskUpdateSchema,
+) -> ShiftTaskSchema:
+    update_dict = update_data.dict(exclude_unset=True)
+
+    if "is_closed" in update_dict:
+        task.closed_at = datetime.now() if update_dict["is_closed"] else None
+
+    for field, value in update_dict.items():
+        setattr(task, field, value)
+
+    await session.commit()
+    await session.refresh(task)
+    return ShiftTaskSchema.from_orm(task)

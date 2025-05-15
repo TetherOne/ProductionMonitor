@@ -30,3 +30,21 @@ class ShiftTaskSchema(ShiftTaskBaseSchema):
 
 class ShiftTaskCreateSchema(ShiftTaskBaseSchema):
     pass
+
+
+class ShiftTaskUpdateSchema(BaseModel):
+    task_representation: str | None = None
+    work_center: str | None = None
+    shift: str | None = None
+    brigade: str | None = None
+
+    batch_number: int | None = None
+    batch_date: date | None = None
+
+    nomenclature: str | None = None
+    code_ekn: str | None = None
+    rc_identifier: str | None = None
+
+    shift_start: datetime | None = None
+    shift_end: datetime | None = None
+    is_closed: bool | None = None
