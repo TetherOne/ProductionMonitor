@@ -26,3 +26,7 @@ class ShiftTaskBaseSchema(BaseModel):
 
 class ShiftTaskSchema(ShiftTaskBaseSchema):
     id: int
+
+
+class ShiftTaskCreateSchema(ShiftTaskBaseSchema):
+    pass

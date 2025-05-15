@@ -3,7 +3,10 @@ from datetime import date
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.production_monitor.api.shift_task.schemas import ShiftTaskSchema
+from src.production_monitor.api.shift_task.schemas import (
+    ShiftTaskSchema,
+    ShiftTaskCreateSchema,
+)
 from src.production_monitor.models import ShiftTask
 
 
@@ -41,3 +44,16 @@ async def get_shift_task_by_id(
     stmt = select(ShiftTask).where(ShiftTask.id == task_id)
     result = await session.scalar(stmt)
     return result
+
+
+async def create_shift_tasks(
+    session: AsyncSession,
+    shift_tasks: list[ShiftTaskCreateSchema],
+) -> list[ShiftTaskCreateSchema]:
+    created_tasks = []
+    for task_data in shift_tasks:
+        task = ShiftTask(**task_data.dict())
+        session.add(task)
+        created_tasks.append(task_data)
+    await session.commit()
+    return created_tasks
