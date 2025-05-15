@@ -15,6 +15,11 @@ class DetailedHTTPException(HTTPException):
         )
 
 
+class BadRequest(DetailedHTTPException):
+    STATUS_CODE = status.HTTP_400_BAD_REQUEST
+    DETAIL = "Bad Request"
+
+
 class NotFound(DetailedHTTPException):
     STATUS_CODE = status.HTTP_404_NOT_FOUND
     DEFAULT_DETAIL = "Not found"
