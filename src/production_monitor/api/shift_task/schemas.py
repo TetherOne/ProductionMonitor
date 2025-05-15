@@ -21,8 +21,7 @@ class ShiftTaskBaseSchema(BaseModel):
     is_closed: bool = False
     closed_at: datetime | None = None
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 
 class ShiftTaskSchema(ShiftTaskBaseSchema):
