@@ -5,6 +5,7 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 class APIPrefix(BaseModel):
     prefix: str = "/api"
     shift_tasks: str = "/shift-tasks"
+    product_codes: str = "/product-codes"
 
     @property
     def full_prefix(self) -> str:

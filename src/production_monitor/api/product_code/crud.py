@@ -1,0 +1,47 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.production_monitor.api.product_code.schemas import ProductCodeCreateSchema
+from src.production_monitor.models import ShiftTask, ProductCode
+from typing import Sequence
+
+
+async def add_product_codes(
+    session: AsyncSession,
+    product_data: Sequence[ProductCodeCreateSchema],
+) -> Sequence[ProductCode]:
+    result = []
+    existing_codes = {
+        row[0]
+        for row in await session.execute(
+            select(ProductCode.unique_code).where(
+                ProductCode.unique_code.in_([p.unique_code for p in product_data])
+            )
+        )
+    }
+    for item in product_data:
+        if item.unique_code in existing_codes:
+            continue
+
+        # Получаем соответствующую сменную задачу
+        shift_task = await session.scalar(
+            select(ShiftTask).where(
+                ShiftTask.batch_number == item.batch_number,
+                ShiftTask.batch_date == item.batch_date,
+            )
+        )
+
+        if not shift_task:
+            continue
+
+        new_product = ProductCode(
+            unique_code=item.unique_code,
+            shift_task_id=shift_task.id,
+            is_aggregated=False,
+            aggregated_at=None,
+        )
+        result.append(new_product)
+        session.add(new_product)
+
+    await session.commit()
+    return result
