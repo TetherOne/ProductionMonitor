@@ -34,7 +34,7 @@ async def get_shift_tasks(
 ):
     return await crud.get_shift_tasks(
         session=session,
-        **filters.dict(),
+        **filters.model_dump(),
     )
 
 
