@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.production_monitor.utils.db_helper import db_helper
-from . import crud
-from .schemas import (
+from src.production_monitor.api.product_code import crud
+from src.production_monitor.api.product_code.schemas import (
     ProductCodeCreateSchema,
     AggregateProductCodeResponse,
     AggregateProductCodeRequest,

@@ -16,6 +16,10 @@ async def add_product_codes(
     product_codes: Sequence[ProductCodeCreateSchema],
 ) -> Sequence[ProductCode]:
     result = []
+    """
+    Извлекает множество уникальных кодов, уже существующих в базе,
+    из переданных на добавление к ShiftTask
+    """
     existing_codes = {
         row[0]
         for row in await session.execute(
@@ -24,29 +28,28 @@ async def add_product_codes(
             )
         )
     }
+
     for item in product_codes:
-        if item.unique_code in existing_codes:
-            continue
-
-        # Получаем соответствующую сменную задачу
-        shift_task = await session.scalar(
-            select(ShiftTask).where(
-                ShiftTask.batch_number == item.batch_number,
-                ShiftTask.batch_date == item.batch_date,
+        if item.unique_code not in existing_codes:
+            """
+            Получаем соответствующую сменную задачу
+            """
+            shift_task = await session.scalar(
+                select(ShiftTask).where(
+                    ShiftTask.batch_number == item.batch_number,
+                    ShiftTask.batch_date == item.batch_date,
+                )
             )
-        )
 
-        if not shift_task:
-            continue
-
-        new_product = ProductCode(
-            unique_code=item.unique_code,
-            shift_task_id=shift_task.id,
-            is_aggregated=False,
-            aggregated_at=None,
-        )
-        result.append(new_product)
-        session.add(new_product)
+            if shift_task:
+                new_product = ProductCode(
+                    unique_code=item.unique_code,
+                    shift_task_id=shift_task.id,
+                    is_aggregated=False,
+                    aggregated_at=None,
+                )
+                result.append(new_product)
+                session.add(new_product)
 
     await session.commit()
     return result
