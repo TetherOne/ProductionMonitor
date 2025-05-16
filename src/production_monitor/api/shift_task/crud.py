@@ -9,6 +9,7 @@ from src.production_monitor.api.shift_task.schemas import (
     ShiftTaskUpdateSchema,
 )
 from src.production_monitor.models import ShiftTask
+from src.production_monitor.utils.filters import build_shift_task_filters
 
 
 async def get_shift_tasks(
@@ -20,19 +21,10 @@ async def get_shift_tasks(
     limit: int = 100,
 ) -> list[ShiftTaskSchema] | None:
     stmt = select(ShiftTask)
-    filters = []
-    if is_closed is not None:
-        filters.append(ShiftTask.is_closed == is_closed)
-    if batch_number is not None:
-        filters.append(ShiftTask.batch_number == batch_number)
-    if batch_date is not None:
-        filters.append(ShiftTask.batch_date == batch_date)
-
+    filters = build_shift_task_filters(is_closed, batch_number, batch_date)
     if filters:
         stmt = stmt.where(and_(*filters))
-
     stmt = stmt.offset(offset).limit(limit)
-
     result = await session.scalars(stmt)
     shift_tasks = result.all()
     return [ShiftTaskSchema.from_orm(task) for task in shift_tasks]
